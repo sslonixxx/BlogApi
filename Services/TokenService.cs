@@ -10,7 +10,7 @@ public class TokenService(IOptions<JwtOptions> options) : ITokenService
     private readonly JwtOptions _options = options.Value;
     public string GenerateToken(User user)
     {
-        Claim[] claims = [new("userId", user.Id.ToString())];
+        Claim[] claims = [new(ClaimTypes.Sid, user.Id.ToString())];
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)),
             SecurityAlgorithms.HmacSha256);

@@ -30,5 +30,7 @@ public class User
     [StringLength(1000, MinimumLength = 6, ErrorMessage = ErrorConstants.PasswordLengthError)]
     public string Password { get; set; }
 
+    public List<Post>? LikedPosts { get; set; } = new();
+    public List<Community>? AdminOfCommunities { get; set; } = new();
 
 }

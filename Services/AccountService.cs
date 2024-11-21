@@ -6,9 +6,10 @@ public class AccountService(DataContext context, IPasswordHasher passwordHasher,
     {
         var hashedPassword = passwordHasher.Generate(userModel.Password);
         var user = UserMapper.MapFromRegisterModelToEntity(userModel, hashedPassword);
+        Console.WriteLine(user);
 
-        // await context.User.AddAsync(user);
-        // await context.User.SaveChangesAsync();
+        await context.Users.AddAsync(user);
+        await context.SaveChangesAsync();
 
         var token = new TokenResponse { Token = tokenService.GenerateToken(user) };
 
@@ -18,7 +19,7 @@ public class AccountService(DataContext context, IPasswordHasher passwordHasher,
 
     public async Task<TokenResponse> Login(LoginCredentials loginCredentials)
     {
-        var user = await context.User.FirstOrDefaultAsync(user => user.Email == loginCredentials.Email);
+        var user = await context.Users.FirstOrDefaultAsync(user => user.Email == loginCredentials.Email);
         var result = passwordHasher.Verify(loginCredentials.Password, user.Password);
 
         var token = new TokenResponse { Token = tokenService.GenerateToken(user) };

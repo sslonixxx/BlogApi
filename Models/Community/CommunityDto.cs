@@ -1,8 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
-public class UserDto
+public class CommunityDto
 {
-
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public Guid Id { get; set; }
 
@@ -12,15 +11,15 @@ public class UserDto
     [StringLength(1000, MinimumLength = 1, ErrorMessage = ErrorConstants.NameLengthError)]
     public string Name { get; set; }
 
-    public string BirthDate { get; set; }
+    public string? Decription { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
-    public GenderEnum Gender { get; set; }
+    public bool IsClosed { get; set; } = false;
+
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
-    [StringLength(1000, MinimumLength = 1, ErrorMessage = ErrorConstants.EmailLengthError)]
-    public string Email { get; set; }
+    public int SubscribersCount { get; set; } = 0;
 
-    public string PhoneNumber { get; set; }
+
 
 }

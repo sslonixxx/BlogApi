@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -9,9 +11,16 @@ services.AddControllers();
 
 services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 services.AddHttpContextAccessor();
+services.AddDbContext<DataContext>(options =>
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-// services.AddSingleton<JwtConfigurarion>();
-JwtConfigurarion.AddApiAuthentication(services, services.BuildServiceProvider().GetRequiredService<IOptions<JwtOptions>>());
+
+JwtOptions jwtOptions = new();
+configuration.GetSection(nameof(JwtOptions)).Bind(jwtOptions);
+
+//services.AddSingleton(jwtOptions);
+//configuration.Get<JwtOptions>(configuration.GetSection(""));
+//JwtConfigurarion.AddApiAuthentication(services, services.BuildServiceProvider().GetRequiredService<IOptions<JwtOptions>>());
 
 services.AddSwaggerGen(c =>
 {
@@ -19,7 +28,9 @@ services.AddSwaggerGen(c =>
     c.EnableAnnotations();
 });
 
-
+services.AddScoped<ITokenService, TokenService>();
+services.AddScoped<IAccountService, AccountService>();
+services.AddScoped<IPasswordHasher, PasswordHasher>();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
@@ -31,6 +42,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseRouting();
+app.MapControllers();
 
-app.UseHttpsRedirection();
 app.Run();
