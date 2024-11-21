@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-public class JwtConfigurarion
+public class JwtConfiguration
 {
     public static void AddApiAuthentication(
         IServiceCollection services,

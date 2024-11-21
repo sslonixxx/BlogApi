@@ -6357,12 +6357,13 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/gerget/blog-api/blog-api.csproj",
+      "projectUniqueName": "/Users/gerget/RiderProjects/webNET-2024_aspnet_1/blog-api.csproj",
       "projectName": "blog-api",
-      "projectPath": "/Users/gerget/blog-api/blog-api.csproj",
+      "projectPath": "/Users/gerget/RiderProjects/webNET-2024_aspnet_1/blog-api.csproj",
       "packagesPath": "/Users/gerget/.nuget/packages/",
-      "outputPath": "/Users/gerget/blog-api/obj/",
+      "outputPath": "/Users/gerget/RiderProjects/webNET-2024_aspnet_1/obj/",
       "projectStyle": "PackageReference",
+      "UsingMicrosoftNETSdk": false,
       "configFilePaths": [
         "/Users/gerget/.nuget/NuGet/NuGet.Config"
       ],
@@ -6502,13 +6503,5 @@
         "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Произошла ошибка при получении данных уязвимости пакета: Не удалось загрузить индекс службы для источника https://api.nuget.org/v3/index.json."
-    }
-  ]
+  }
 }
