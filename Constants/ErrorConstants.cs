@@ -13,5 +13,11 @@ static class ErrorConstants
     public const string AuthorLengthError = "Minimum length of author = 1";
     public const string TagsLengthError = "Minimum item of tags = 1";
     public const string EmailValidError = "Email is invalid";
+    
+    public const string ProfileAlreadyExistsError = "Profile already exist";
+    public const string ProfileNotExistsError = "Profile not exist";
+    public const string PasswordNotExistsError = "Password not exists";
+    public const string EmailNotValid = "Email not valid";
+    public const string PasswordNotValid = "Password must include one or more numbers";
 
 }

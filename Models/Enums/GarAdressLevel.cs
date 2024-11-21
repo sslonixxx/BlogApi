@@ -1,3 +1,7 @@
+using System.Text.Json.Serialization;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+
 public enum GarAdressLevel
 {
     Region, AdministrativeArea, MunicipalArea, RuralUrbanSettlement, City, Locality, ElementOfPlanningStructure,

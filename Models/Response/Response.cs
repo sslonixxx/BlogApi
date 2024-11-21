@@ -1,7 +1,12 @@
-using Org.BouncyCastle.Tls;
+namespace blog_api.Models.Response;
 
-public class Responce
+public class Response ()
 {
+    public Response(string status, string message) : this()
+    {
+        Status = status;
+        Message = message;
+    }
 
     public string? Status { get; set; }
 

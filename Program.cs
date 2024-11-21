@@ -1,3 +1,4 @@
+using blog_api.Middleware;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 
 services.AddControllers();
+
 
 services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 services.AddHttpContextAccessor();
@@ -36,6 +38,10 @@ services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExeptionMiddleware>();
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -46,3 +52,5 @@ app.UseRouting();
 app.MapControllers();
 
 app.Run();
+
+
