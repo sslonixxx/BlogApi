@@ -1,6 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using blog_api.Middleware;
+using blog_api.Services.Impls;
+using blog_api.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -23,6 +25,7 @@ services.AddDbContext<DataContext>(options =>
 
 JwtOptions jwtOptions = new();
 configuration.GetSection(nameof(JwtOptions)).Bind(jwtOptions);
+services.AddSingleton<JwtSecurityTokenHandler>();
 
 
 services.AddAuthentication(x =>
@@ -48,6 +51,7 @@ services.AddAuthentication(x =>
 services.AddScoped<ITokenService, TokenService>();
 services.AddScoped<IAccountService, AccountService>();
 services.AddScoped<IPasswordHasher, PasswordHasher>();
+services.AddScoped<ITagService, TagService>();
 services.AddEndpointsApiExplorer();
 
 

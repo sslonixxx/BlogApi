@@ -7,4 +7,5 @@ public interface IAccountService
     public Task<TokenResponse> Login(LoginCredentials user);
     public Task<Response> Logout(string token);
     public Task<UserDto> GetProfile(string? token);
+    public Task<Response> EditProfile(UserEditModel userEditModel, string token);
 }

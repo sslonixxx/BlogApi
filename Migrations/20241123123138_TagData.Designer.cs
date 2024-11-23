@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace blog_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241121161246_AddTokenBanned")]
-    partial class AddTokenBanned
+    [Migration("20241123123138_TagData")]
+    partial class TagData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -159,6 +159,25 @@ namespace blog_api.Migrations
                     b.ToTable("Post");
                 });
 
+            modelBuilder.Entity("Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tag");
+                });
+
             modelBuilder.Entity("TagDto", b =>
                 {
                     b.Property<Guid>("Id")
@@ -238,8 +257,8 @@ namespace blog_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("BirthDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("CommunityId")
                         .HasColumnType("uuid");

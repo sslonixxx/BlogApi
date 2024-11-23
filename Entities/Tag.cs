@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class Tag
 {
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
-    public Guid Id { get; set; }
+    [Key] public Guid Id { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public DateTime CreateTime { get; set; }

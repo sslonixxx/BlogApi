@@ -6,7 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 [ApiController]
 [Route("api/account")]
-public class AccountController(IAccountService accountService, ILogger<AccountController> logger) : ControllerBase
+public class AccountController(IAccountService accountService, ILogger<AccountController> logger, ITokenService tokenService) : ControllerBase
 {
     [HttpPost("register")]
     //[SwaggerOperation(Summary = SwaggerOperationConstants.UserRegister)]
@@ -30,21 +30,31 @@ public class AccountController(IAccountService accountService, ILogger<AccountCo
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
     {
-        string token = HttpContext.Request.Headers["Authorization"];
+        var authorizationHeader = Request.Headers["Authorization"].ToString();
+        var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
+    
         return Ok(await accountService.GetProfile(token));
     }
     
-    
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<IActionResult> EditProfile(UserEditModel userEditModel)
+    {
+        var authorizationHeader = Request.Headers["Authorization"].ToString();
+        var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
+        return Ok(await accountService.EditProfile(userEditModel, token));
+    }
     
     [Authorize]
     [HttpPost("logout")]
     //[SwaggerOperation(Summary = SwaggerOperationConstants.UserLogout)]
     public async Task<IActionResult> Logout()
     {
-        Console.WriteLine("DEBUG");
         string token = HttpContext.Request.Headers["Authorization"];
         
         return Ok(await accountService.Logout(token));
     }
+
+    
 
 }

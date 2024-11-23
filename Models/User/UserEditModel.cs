@@ -7,7 +7,7 @@ public record UserEditModel
     [StringLength(1000, MinimumLength = 1, ErrorMessage = ErrorConstants.NameLengthError)]
     public string Name { get; set; }
 
-    public string? BirthDate { get; set; }
+    public DateTime? BirthDate { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public GenderEnum Gender { get; set; }
