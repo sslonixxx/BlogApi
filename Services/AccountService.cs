@@ -40,9 +40,19 @@ public class AccountService(DataContext context, IPasswordHasher passwordHasher,
         var token = new TokenResponse { Token = tokenService.GenerateToken(user) };
         return token;
     }
-
-    public async Task<Response> Logout()
+    
+    public async Task<Response> Logout(string token)
     {
+        //if (await tokenService.IsTokenBanned(token));
+        context.BannedTokens.Add(new TokenEntity{Token = token});
+        await context.SaveChangesAsync();
         return await Task.FromResult(new Response(null, "Logout successful"));
+    }
+
+    public async Task<UserDto> GetProfile(string token)
+    {
+
+
+        return new UserDto();
     }
 }

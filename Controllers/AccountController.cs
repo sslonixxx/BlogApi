@@ -25,15 +25,26 @@ public class AccountController(IAccountService accountService, ILogger<AccountCo
         return Ok(token);
 
     }
-    
-    [HttpPost("logout")]
-    //[SwaggerOperation(Summary = SwaggerOperationConstants.UserLogout)]
+
     [Authorize]
-    public async Task<IActionResult> Logout()
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetProfile()
     {
-        return Ok(await accountService.Logout());
+        string token = HttpContext.Request.Headers["Authorization"];
+        return Ok(await accountService.GetProfile(token));
     }
     
     
+    
+    [Authorize]
+    [HttpPost("logout")]
+    //[SwaggerOperation(Summary = SwaggerOperationConstants.UserLogout)]
+    public async Task<IActionResult> Logout()
+    {
+        Console.WriteLine("DEBUG");
+        string token = HttpContext.Request.Headers["Authorization"];
+        
+        return Ok(await accountService.Logout(token));
+    }
 
 }

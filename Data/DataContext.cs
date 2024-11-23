@@ -12,4 +12,5 @@ public class DataContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<TokenEntity> BannedTokens { get; set; }
 }
