@@ -11,7 +11,7 @@ public class CommunityDto
     [StringLength(1000, MinimumLength = 1, ErrorMessage = ErrorConstants.NameLengthError)]
     public string Name { get; set; }
 
-    public string? Decription { get; set; }
+    public string? Description { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public bool IsClosed { get; set; } = false;

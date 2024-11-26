@@ -8,4 +8,5 @@ public interface IAccountService
     public Task<Response> Logout(string token);
     public Task<UserDto> GetProfile(string? token);
     public Task<Response> EditProfile(UserEditModel userEditModel, string token);
+    public Task<User> GetUserByToken(string token);
 }

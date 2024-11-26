@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace blog_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241123115757_Initial")]
-    partial class Initial
+    [Migration("20241126112111_TagData")]
+    partial class TagData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,7 +74,7 @@ namespace blog_api.Migrations
                     b.Property<DateTime>("CreateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Decription")
+                    b.Property<string>("Description")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsClosed")
@@ -104,7 +104,7 @@ namespace blog_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("AdreddId")
+                    b.Property<Guid?>("AddressId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Author")
@@ -127,7 +127,7 @@ namespace blog_api.Migrations
                     b.Property<DateTime>("CreateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Decription")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
@@ -173,25 +173,6 @@ namespace blog_api.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Tag");
-                });
-
-            modelBuilder.Entity("TagDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
                     b.Property<Guid?>("PostId")
                         .HasColumnType("uuid");
 
@@ -199,7 +180,7 @@ namespace blog_api.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("TagDto");
+                    b.ToTable("Tag");
                 });
 
             modelBuilder.Entity("TokenEntity", b =>
@@ -310,7 +291,7 @@ namespace blog_api.Migrations
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("TagDto", b =>
+            modelBuilder.Entity("Tag", b =>
                 {
                     b.HasOne("Post", null)
                         .WithMany("Tags")

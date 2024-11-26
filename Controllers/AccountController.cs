@@ -12,7 +12,6 @@ public class AccountController(IAccountService accountService, ILogger<AccountCo
     //[SwaggerOperation(Summary = SwaggerOperationConstants.UserRegister)]
     public async Task<IActionResult> Register(UserRegisterModel userRegisterModel)
     {
-        logger.LogInformation("reg");
         var token = await accountService.Register(userRegisterModel);
         return Ok(token);
     }

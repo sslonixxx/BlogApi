@@ -15,7 +15,7 @@ public class PostDto
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     [StringLength(1000, MinimumLength = 1, ErrorMessage = ErrorConstants.DescriptionLengthError)]
 
-    public string Decription { get; set; }
+    public string Description { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public int ReadingTime { get; set; }
@@ -35,7 +35,7 @@ public class PostDto
 
     public string? CommunityName { get; set; }
 
-    public Guid? AdreddId { get; set; }
+    public Guid? AddressId { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public int Likes { get; set; } = 0;

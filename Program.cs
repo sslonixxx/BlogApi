@@ -1,6 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+// using blog_api.Data;
 using blog_api.Middleware;
+using blog_api.Models.Fias;
 using blog_api.Services.Impls;
 using blog_api.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,6 +23,9 @@ services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 services.AddHttpContextAccessor();
 services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AddressContext>(options =>
+    options.UseNpgsql(configuration.GetConnectionString("FiasConnection")));
+
 
 
 JwtOptions jwtOptions = new();
@@ -52,6 +57,8 @@ services.AddScoped<ITokenService, TokenService>();
 services.AddScoped<IAccountService, AccountService>();
 services.AddScoped<IPasswordHasher, PasswordHasher>();
 services.AddScoped<ITagService, TagService>();
+services.AddScoped<ICommunityService, CommunityService>();
+services.AddScoped<IPostService, PostService>();
 services.AddEndpointsApiExplorer();
 
 

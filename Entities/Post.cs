@@ -17,7 +17,7 @@ public class Post
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     [StringLength(1000, MinimumLength = 1, ErrorMessage = ErrorConstants.DescriptionLengthError)]
 
-    public string Decription { get; set; }
+    public string Description { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public int ReadingTime { get; set; }
@@ -37,7 +37,7 @@ public class Post
 
     public string? CommunityName { get; set; }
 
-    public Guid? AdreddId { get; set; }
+    public Guid? AddressId { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public int Likes { get; set; } = 0;
@@ -48,7 +48,7 @@ public class Post
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public int CommentsCount { get; set; } = 0;
 
-    public List<TagDto?> Tags { get; set; } = new();
+    public List<Tag?> Tags { get; set; } = new();
 
     public List<CommentDto> Comments { get; set; } = new();
 
