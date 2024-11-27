@@ -16,4 +16,6 @@ public class DataContext : DbContext
     public DbSet<Tag> Tags { get; set; }
     
     public DbSet<Post?> Posts { get; set; }
+    
+    public DbSet<Community> Communities { get; set; }
 }

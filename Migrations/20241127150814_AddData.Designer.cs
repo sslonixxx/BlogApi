@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace blog_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241127105107_TagData")]
-    partial class TagData
+    [Migration("20241127150814_AddData")]
+    partial class AddData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,14 +88,24 @@ namespace blog_api.Migrations
                     b.Property<int>("SubscribersCount")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Community");
+                });
+
+            modelBuilder.Entity("CommunityUser", b =>
+                {
+                    b.Property<Guid>("AdminOfCommunitiesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AdministratorsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("AdminOfCommunitiesId", "AdministratorsId");
+
+                    b.HasIndex("AdministratorsId");
+
+                    b.ToTable("CommunityUser");
                 });
 
             modelBuilder.Entity("Post", b =>
@@ -239,44 +249,6 @@ namespace blog_api.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("UserDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("BirthDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("CommunityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<int>("Gender")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CommunityId");
-
-                    b.ToTable("UserDto");
-                });
-
             modelBuilder.Entity("CommentDto", b =>
                 {
                     b.HasOne("Post", null)
@@ -284,11 +256,19 @@ namespace blog_api.Migrations
                         .HasForeignKey("PostId");
                 });
 
-            modelBuilder.Entity("Community", b =>
+            modelBuilder.Entity("CommunityUser", b =>
                 {
+                    b.HasOne("Community", null)
+                        .WithMany()
+                        .HasForeignKey("AdminOfCommunitiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("User", null)
-                        .WithMany("AdminOfCommunities")
-                        .HasForeignKey("UserId");
+                        .WithMany()
+                        .HasForeignKey("AdministratorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PostUser", b =>
@@ -313,28 +293,11 @@ namespace blog_api.Migrations
                         .HasForeignKey("PostId");
                 });
 
-            modelBuilder.Entity("UserDto", b =>
-                {
-                    b.HasOne("Community", null)
-                        .WithMany("Administrators")
-                        .HasForeignKey("CommunityId");
-                });
-
-            modelBuilder.Entity("Community", b =>
-                {
-                    b.Navigation("Administrators");
-                });
-
             modelBuilder.Entity("Post", b =>
                 {
                     b.Navigation("Comments");
 
                     b.Navigation("Tags");
-                });
-
-            modelBuilder.Entity("User", b =>
-                {
-                    b.Navigation("AdminOfCommunities");
                 });
 #pragma warning restore 612, 618
         }

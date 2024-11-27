@@ -24,8 +24,6 @@ public abstract class PostMapper
 
     public static PostFullDto PostToPostFullDto(Post post, User user, List<TagDto?> tags)
     {
-        // var isLike = post.LikedUsers.Any(u => u.Id == post.AuthorId);
-        // Console.WriteLine(isLike);
         var postFullDto = new PostFullDto()
         {
             Id = post.Id,
@@ -41,7 +39,7 @@ public abstract class PostMapper
             CommunityName = post.CommunityName,
             Likes = post.Likes,
             HasLike = post.LikedUsers.Any(u => u.Id == post.AuthorId),
-            //добавить комментарии и лайки
+            //добавить комментарии и cкушать тортик))))))))
             Tags = tags
         };
         return postFullDto;

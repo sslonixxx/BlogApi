@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace blog_api.Migrations
 {
     /// <inheritdoc />
-    public partial class Like : Migration
+    public partial class Community : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,6 +20,22 @@ namespace blog_api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BannedTokens", x => x.Token);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Community",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Name = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    IsClosed = table.Column<bool>(type: "boolean", nullable: false),
+                    SubscribersCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Community", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -107,25 +123,27 @@ namespace blog_api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Community",
+                name: "CommunityUser",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    IsClosed = table.Column<bool>(type: "boolean", nullable: false),
-                    SubscribersCount = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
+                    AdminOfCommunitiesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AdministratorsId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Community", x => x.Id);
+                    table.PrimaryKey("PK_CommunityUser", x => new { x.AdminOfCommunitiesId, x.AdministratorsId });
                     table.ForeignKey(
-                        name: "FK_Community_User_UserId",
-                        column: x => x.UserId,
+                        name: "FK_CommunityUser_Community_AdminOfCommunitiesId",
+                        column: x => x.AdminOfCommunitiesId,
+                        principalTable: "Community",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CommunityUser_User_AdministratorsId",
+                        column: x => x.AdministratorsId,
                         principalTable: "User",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -152,38 +170,15 @@ namespace blog_api.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "UserDto",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Gender = table.Column<int>(type: "integer", nullable: false),
-                    Email = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
-                    CommunityId = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserDto", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserDto_Community_CommunityId",
-                        column: x => x.CommunityId,
-                        principalTable: "Community",
-                        principalColumn: "Id");
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_CommentDto_PostId",
                 table: "CommentDto",
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Community_UserId",
-                table: "Community",
-                column: "UserId");
+                name: "IX_CommunityUser_AdministratorsId",
+                table: "CommunityUser",
+                column: "AdministratorsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PostUser_LikedUsersId",
@@ -194,11 +189,6 @@ namespace blog_api.Migrations
                 name: "IX_Tag_PostId",
                 table: "Tag",
                 column: "PostId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserDto_CommunityId",
-                table: "UserDto",
-                column: "CommunityId");
         }
 
         /// <inheritdoc />
@@ -211,22 +201,22 @@ namespace blog_api.Migrations
                 name: "CommentDto");
 
             migrationBuilder.DropTable(
+                name: "CommunityUser");
+
+            migrationBuilder.DropTable(
                 name: "PostUser");
 
             migrationBuilder.DropTable(
                 name: "Tag");
 
             migrationBuilder.DropTable(
-                name: "UserDto");
-
-            migrationBuilder.DropTable(
-                name: "Post");
-
-            migrationBuilder.DropTable(
                 name: "Community");
 
             migrationBuilder.DropTable(
                 name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Post");
         }
     }
 }
