@@ -2,10 +2,10 @@ namespace blog_api.Exeptions;
 
 public class CustomException: Exception
 {
-    public int ErrorCode { get; set; }
+    public int StatusCode { get; set; }
 
-    public CustomException(string message, int errorCode) : base(message)
+    public CustomException(string message, int statusCode) : base(message)
     {
-        ErrorCode = errorCode;
+        StatusCode = statusCode;
     }
 }

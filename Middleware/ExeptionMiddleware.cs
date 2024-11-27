@@ -24,6 +24,14 @@ public class ExeptionMiddleware(RequestDelegate next, ILogger<ExeptionMiddleware
         {
             await HandleExceptionAsync(context, HttpStatusCode.Unauthorized, ex.Message);
         }
+        catch (CustomException customEx)
+        {
+            await HandleCustomExceptionAsync(context, customEx);
+        }
+        catch (Exception ex)
+        {
+            await HandleExceptionsAsync(context, ex);
+        }
     }
     private static Task HandleExceptionAsync(HttpContext context, HttpStatusCode statusCode, string errorMessage)
     {
@@ -32,4 +40,29 @@ public class ExeptionMiddleware(RequestDelegate next, ILogger<ExeptionMiddleware
         var result = JsonSerializer.Serialize(new {errorMessage = errorMessage});
         return context.Response.WriteAsync(result);
     }
+    
+    private static Task HandleCustomExceptionAsync(HttpContext context, CustomException exception)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = exception.StatusCode;
+
+        return context.Response.WriteAsync(new
+        {
+            StatusCode = exception.StatusCode,
+            Message = exception.Message
+        }.ToString());
+    }
+
+    private static Task HandleExceptionsAsync(HttpContext context, Exception exception)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        return context.Response.WriteAsync(new
+        {
+            StatusCode = StatusCodes.Status500InternalServerError,
+            Message = "An unexpected error occurred"
+        }.ToString());
+    }
+    
 }

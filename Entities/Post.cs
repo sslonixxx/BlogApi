@@ -42,8 +42,7 @@ public class Post
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public int Likes { get; set; } = 0;
 
-    [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
-    public bool HasLike { get; set; } = false;
+    public List<User> LikedUsers { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public int CommentsCount { get; set; } = 0;

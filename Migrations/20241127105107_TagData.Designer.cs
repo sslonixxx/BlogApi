@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace blog_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241126112111_TagData")]
+    [Migration("20241127105107_TagData")]
     partial class TagData
     {
         /// <inheritdoc />
@@ -132,9 +132,6 @@ namespace blog_api.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<bool>("HasLike")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Image")
                         .HasColumnType("text");
 
@@ -149,14 +146,24 @@ namespace blog_api.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Post");
+                });
+
+            modelBuilder.Entity("PostUser", b =>
+                {
+                    b.Property<Guid>("LikedPostsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("LikedUsersId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("LikedPostsId", "LikedUsersId");
+
+                    b.HasIndex("LikedUsersId");
+
+                    b.ToTable("PostUser");
                 });
 
             modelBuilder.Entity("Tag", b =>
@@ -284,11 +291,19 @@ namespace blog_api.Migrations
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("Post", b =>
+            modelBuilder.Entity("PostUser", b =>
                 {
+                    b.HasOne("Post", null)
+                        .WithMany()
+                        .HasForeignKey("LikedPostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("User", null)
-                        .WithMany("LikedPosts")
-                        .HasForeignKey("UserId");
+                        .WithMany()
+                        .HasForeignKey("LikedUsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Tag", b =>
@@ -320,8 +335,6 @@ namespace blog_api.Migrations
             modelBuilder.Entity("User", b =>
                 {
                     b.Navigation("AdminOfCommunities");
-
-                    b.Navigation("LikedPosts");
                 });
 #pragma warning restore 612, 618
         }

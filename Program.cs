@@ -31,6 +31,20 @@ builder.Services.AddDbContext<AddressContext>(options =>
 JwtOptions jwtOptions = new();
 configuration.GetSection(nameof(JwtOptions)).Bind(jwtOptions);
 services.AddSingleton<JwtSecurityTokenHandler>();
+services.AddSingleton(provider =>
+{
+    return new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtOptions.SecretKey)),
+        ValidIssuer = jwtOptions.Issuer,
+        ValidateIssuer = true,
+        ValidateLifetime = true,
+        ValidAudience = jwtOptions.Audience,
+        ValidateAudience = true
+    };
+});
+
 
 
 services.AddAuthentication(x =>
@@ -90,6 +104,8 @@ services.AddSwaggerGen(options =>
         }
     });
 });
+
+
 
 var app = builder.Build();
 

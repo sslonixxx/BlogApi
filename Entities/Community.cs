@@ -25,6 +25,6 @@ public class Community
 
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
-    public List<UserDto> Administrators { get; set; } = new();
+    public List<User> Administrators { get; set; } = new();
 
 }

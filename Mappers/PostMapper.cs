@@ -21,4 +21,29 @@ public abstract class PostMapper
         };
         return post;
     }
+
+    public static PostFullDto PostToPostFullDto(Post post, User user, List<TagDto?> tags)
+    {
+        // var isLike = post.LikedUsers.Any(u => u.Id == post.AuthorId);
+        // Console.WriteLine(isLike);
+        var postFullDto = new PostFullDto()
+        {
+            Id = post.Id,
+            Title = post.Title,
+            Description = post.Description,
+            AuthorId = post.AuthorId,
+            Author = user.Name,
+            ReadingTime = post.ReadingTime,
+            CreateTime = post.CreateTime,
+            AddressId = post.AddressId,
+            Image = post.Image,
+            CommunityId = post.CommunityId,
+            CommunityName = post.CommunityName,
+            Likes = post.Likes,
+            HasLike = post.LikedUsers.Any(u => u.Id == post.AuthorId),
+            //добавить комментарии и лайки
+            Tags = tags
+        };
+        return postFullDto;
+    }
 }
