@@ -40,7 +40,8 @@ namespace blog_api.Migrations
 
         }
 
-        /// <inheritdoc />
+
+/// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DeleteData(

@@ -90,21 +90,6 @@ namespace blog_api.Migrations
                     b.ToTable("Community");
                 });
 
-            modelBuilder.Entity("CommunityUser", b =>
-                {
-                    b.Property<Guid>("AdminOfCommunitiesId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AdministratorsId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("AdminOfCommunitiesId", "AdministratorsId");
-
-                    b.HasIndex("AdministratorsId");
-
-                    b.ToTable("CommunityUser");
-                });
-
             modelBuilder.Entity("Post", b =>
                 {
                     b.Property<Guid>("Id")
@@ -246,26 +231,29 @@ namespace blog_api.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("blog_api.Entities.CommunityUser", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CommunityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "CommunityId");
+
+                    b.HasIndex("CommunityId");
+
+                    b.ToTable("CommunityUser");
+                });
+
             modelBuilder.Entity("CommentDto", b =>
                 {
                     b.HasOne("Post", null)
                         .WithMany("Comments")
                         .HasForeignKey("PostId");
-                });
-
-            modelBuilder.Entity("CommunityUser", b =>
-                {
-                    b.HasOne("Community", null)
-                        .WithMany()
-                        .HasForeignKey("AdminOfCommunitiesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("User", null)
-                        .WithMany()
-                        .HasForeignKey("AdministratorsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("PostUser", b =>
@@ -290,11 +278,40 @@ namespace blog_api.Migrations
                         .HasForeignKey("PostId");
                 });
 
+            modelBuilder.Entity("blog_api.Entities.CommunityUser", b =>
+                {
+                    b.HasOne("Community", "Community")
+                        .WithMany("CommunityUser")
+                        .HasForeignKey("CommunityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("User", "User")
+                        .WithMany("CommunityUser")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Community");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Community", b =>
+                {
+                    b.Navigation("CommunityUser");
+                });
+
             modelBuilder.Entity("Post", b =>
                 {
                     b.Navigation("Comments");
 
                     b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("User", b =>
+                {
+                    b.Navigation("CommunityUser");
                 });
 #pragma warning restore 612, 618
         }

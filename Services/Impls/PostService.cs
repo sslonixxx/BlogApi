@@ -13,6 +13,8 @@ public class PostService(DataContext context, IAccountService accountService, IC
     {
         var posts = context.Posts
             .Include(post => post.Tags)
+            .Include(post => post.CommunityId)
+            .Include(post => post.CommunityName)
             .Include(post => post.LikedUsers);
            
         return posts;
@@ -26,7 +28,11 @@ public class PostService(DataContext context, IAccountService accountService, IC
         var user = await accountService.GetUserByToken(token);
         var tags = await tagService.GetTagsById(createPostDto);
         
-        var post = PostMapper.MapCreatePostDtoToPost(createPostDto, user, tags);
+        var community = context.Communities.FirstOrDefault(community => community.Id == communityId);
+        string communityName = community?.Name;
+        if (community != null && context.CommunityUser.All(uc => uc.UserId != user.Id || uc.Role!=CommunityRole.Administrator))
+            throw new CustomException("User is not an admin of this community", 403);
+        var post = PostMapper.MapCreatePostDtoToPost(createPostDto, user, tags, communityId, communityName);
         posts.Add(post);
         await context.SaveChangesAsync();
         return post.Id;
@@ -42,18 +48,27 @@ public class PostService(DataContext context, IAccountService accountService, IC
         User? user = null;
         if(tokenService.ValidateToken(token)) user = await accountService.GetUserByToken(token);
         //проверить права
-        Console.WriteLine(post.LikedUsers);
         return PostMapper.PostToPostFullDto(post, user, tags);
     }
 
+    public void CheckClosedCommunity(Post post, User? user)
+    {
+        Community? community = context.Communities.FirstOrDefault(c => c.Id == post.CommunityId);
+        if (post.CommunityId != null && community.IsClosed &&
+            (user == null || user.CommunityUser.All(uc => uc.CommunityId != community.Id )))
+            throw new CustomException("You don't have rights", 403);
+    }
     public async Task LikePost(Guid postId, string token)
     {
         if (await tokenService.IsTokenBanned(token)) throw new CustomException("Token is banned", 401);
-        var post = await context.Posts.Include(p => p.LikedUsers).FirstOrDefaultAsync(p => p.Id == postId);
+        var post = await context.Posts.Include(p => p.LikedUsers).Include(p => p.CommunityId).FirstOrDefaultAsync(p => p.Id == postId);
         if (post == null) throw new CustomException("There is not a post with this Id", 400);
         var user = await accountService.GetUserByToken(token);
-        //проверить права
+        CheckClosedCommunity(post, user);
         if (post.LikedUsers.Any(u => u.Id == user.Id)) throw new CustomException("User has already liked post", 400);
+        Community? community = context.Communities.FirstOrDefault(c => c.Id == post.CommunityId);
+        if(post.CommunityId != null && community.IsClosed && user.CommunityUser.All(c => c.UserId!=user.Id)) 
+            throw new CustomException("User can't add like to this post", 403);
         post.LikedUsers?.Add(user);
         user.LikedPosts?.Add(post);
         post.Likes += 1;
@@ -66,7 +81,7 @@ public class PostService(DataContext context, IAccountService accountService, IC
         var post = await context.Posts.Include(p => p.LikedUsers).FirstOrDefaultAsync(p => p.Id == postId);
         if (post == null) throw new CustomException("There is not a post with this Id", 400);
         var user = await accountService.GetUserByToken(token);
-        //проверить права
+        CheckClosedCommunity(post, user);
         if (post.LikedUsers.Any(u => u.Id != user.Id)) throw new CustomException("User didn't like this post", 400);
         post.LikedUsers?.Remove(user);
         user.LikedPosts?.Remove(post);

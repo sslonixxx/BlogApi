@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using blog_api.Entities;
 
 [Table("Community")]
 public class Community
@@ -25,6 +26,6 @@ public class Community
 
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
-    public List<User> Administrators { get; set; } = new();
+    public List<CommunityUser>? CommunityUser { get; set; } = new();
 
 }

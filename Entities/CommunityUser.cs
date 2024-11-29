@@ -6,7 +6,7 @@ public class CommunityUser
 {
     [Key]
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
-    public Guid userId { get; set; }
+    public Guid UserId { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
 
@@ -14,4 +14,6 @@ public class CommunityUser
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public CommunityRole Role { get; set; }
+    public User User { get; set; }
+    public Community Community { get; set; }
 }

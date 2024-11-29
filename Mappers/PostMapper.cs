@@ -2,9 +2,9 @@ using blog_api.Models.Post;
 
 namespace blog_api.Mappers;
 
-public abstract class PostMapper
+public abstract class PostMapper(DataContext context)
 {
-    public static Post MapCreatePostDtoToPost(CreatePostDto createPostDto, User user, List<Tag?> tags)
+    public static Post MapCreatePostDtoToPost(CreatePostDto createPostDto, User user, List<Tag?> tags, Guid? communityId, string communityName)
     {
         var post = new Post()
         {
@@ -17,7 +17,9 @@ public abstract class PostMapper
             ReadingTime = createPostDto.ReadingTime,
             Title = createPostDto.Title,
             AddressId = createPostDto.AddressId,
-            Image = createPostDto.Image
+            Image = createPostDto.Image,
+            CommunityId = communityId,
+            CommunityName = communityName
         };
         return post;
     }

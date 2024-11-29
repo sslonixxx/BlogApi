@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using blog_api.Entities;
 
 [Table("User")]
 public class User
@@ -31,6 +32,7 @@ public class User
     public string Password { get; set; }
 
     public List<Post>? LikedPosts { get; set; } = new();
-    public List<Community>? AdminOfCommunities { get; set; } = new();
+    
+    public List<CommunityUser>? CommunityUser { get; set; } = new();
 
 }

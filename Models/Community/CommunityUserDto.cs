@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 public class CommunityUserDto
 {
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
-    public Guid userId { get; set; }
+    public Guid UserId { get; set; }
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
 

@@ -79,30 +79,7 @@ namespace blog_api.Migrations
                     table.PrimaryKey("PK_User", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "CommentDto",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Content = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    AuthorId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Author = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    SubComments = table.Column<int>(type: "integer", nullable: false),
-                    PostId = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CommentDto", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CommentDto_Post_PostId",
-                        column: x => x.PostId,
-                        principalTable: "Post",
-                        principalColumn: "Id");
-                });
-
+            
             migrationBuilder.CreateTable(
                 name: "Tag",
                 columns: table => new
@@ -126,21 +103,22 @@ namespace blog_api.Migrations
                 name: "CommunityUser",
                 columns: table => new
                 {
-                    AdminOfCommunitiesId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AdministratorsId = table.Column<Guid>(type: "uuid", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CommunityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CommunityUser", x => new { x.AdminOfCommunitiesId, x.AdministratorsId });
+                    table.PrimaryKey("PK_CommunityUser", x => new { x.UserId, x.CommunityId });
                     table.ForeignKey(
-                        name: "FK_CommunityUser_Community_AdminOfCommunitiesId",
-                        column: x => x.AdminOfCommunitiesId,
+                        name: "FK_CommunityUser_Community_CommunityId",
+                        column: x => x.CommunityId,
                         principalTable: "Community",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CommunityUser_User_AdministratorsId",
-                        column: x => x.AdministratorsId,
+                        name: "FK_CommunityUser_User_UserId",
+                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -169,16 +147,11 @@ namespace blog_api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
+            
             migrationBuilder.CreateIndex(
-                name: "IX_CommentDto_PostId",
-                table: "CommentDto",
-                column: "PostId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CommunityUser_AdministratorsId",
+                name: "IX_CommunityUser_CommunityId",
                 table: "CommunityUser",
-                column: "AdministratorsId");
+                column: "CommunityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PostUser_LikedUsersId",
@@ -196,9 +169,6 @@ namespace blog_api.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BannedTokens");
-
-            migrationBuilder.DropTable(
-                name: "CommentDto");
 
             migrationBuilder.DropTable(
                 name: "CommunityUser");
