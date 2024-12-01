@@ -12,10 +12,10 @@ public class TokenService(IOptions<JwtOptions> options, DataContext context, Jwt
     private readonly JwtOptions _options = options.Value;
     public string GenerateToken(User user)
     {
-        // Используем ClaimTypes.Sid, как вы хотите
+       
         Claim[] claims = new Claim[]
         {
-            new Claim(ClaimTypes.Sid, user.Id.ToString())  // Здесь используем ClaimTypes.Sid
+            new Claim(ClaimTypes.Sid, user.Id.ToString())  
         };
 
         var signingCredentials = new SigningCredentials(
@@ -49,7 +49,6 @@ public class TokenService(IOptions<JwtOptions> options, DataContext context, Jwt
         var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid);
         if (userIdClaim == null)
         {
-            // Выведите информацию о всех claims в токене для дебага
             Console.WriteLine("SID claim not found. Claims in the token:");
             foreach (var claim in jwtToken.Claims)
             {
@@ -57,7 +56,8 @@ public class TokenService(IOptions<JwtOptions> options, DataContext context, Jwt
             }
             throw new CustomException("Invalid token: SID claim missing", 401);
         }
-        var userId = userIdClaim.Value;        if(userId == null) throw new CustomException("Invalid token", 401);
+        var userId = userIdClaim.Value;       
+        if(userId == null) throw new CustomException("Invalid token", 401);
             
         return userId;
     }

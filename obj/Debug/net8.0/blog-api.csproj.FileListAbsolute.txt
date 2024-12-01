@@ -370,3 +370,5 @@
 /Users/gerget/RiderProjects/webNET-2024_aspnet_1/obj/Debug/net8.0/blog-api.pdb
 /Users/gerget/RiderProjects/webNET-2024_aspnet_1/obj/Debug/net8.0/blog-api.genruntimeconfig.cache
 /Users/gerget/RiderProjects/webNET-2024_aspnet_1/obj/Debug/net8.0/ref/blog-api.dll
+/Users/gerget/RiderProjects/webNET-2024_aspnet_1/bin/Debug/net8.0/Castle.Core.dll
+/Users/gerget/RiderProjects/webNET-2024_aspnet_1/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Proxies.dll

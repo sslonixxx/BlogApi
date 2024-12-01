@@ -78,8 +78,8 @@ namespace blog_api.Migrations
                 {
                     table.PrimaryKey("PK_User", x => x.Id);
                 });
-
             
+
             migrationBuilder.CreateTable(
                 name: "Tag",
                 columns: table => new
@@ -97,6 +97,44 @@ namespace blog_api.Migrations
                         column: x => x.PostId,
                         principalTable: "Post",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Comment",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Content = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    AuthorId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Author = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    SubComments = table.Column<int>(type: "integer", nullable: false),
+                    PostId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CommentParentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comment", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comment_Comment_CommentParentId",
+                        column: x => x.CommentParentId,
+                        principalTable: "Comment",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Comment_Post_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Post",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comment_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -147,6 +185,21 @@ namespace blog_api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comment_CommentParentId",
+                table: "Comment",
+                column: "CommentParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comment_PostId",
+                table: "Comment",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comment_UserId",
+                table: "Comment",
+                column: "UserId");
             
             migrationBuilder.CreateIndex(
                 name: "IX_CommunityUser_CommunityId",
@@ -169,6 +222,10 @@ namespace blog_api.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BannedTokens");
+
+            migrationBuilder.DropTable(
+                name: "Comment");
+            
 
             migrationBuilder.DropTable(
                 name: "CommunityUser");

@@ -23,17 +23,18 @@ public class CommunityService(DataContext context, IAccountService accountServic
         return CommunityMapper.CommunityToCommunityDto(community);
     }
 
-    public async Task<string?> GetUserRole(Guid id, string token)
+    public async Task<string?> GetUserRole(Guid id, string userId)
     {
-        var user = await accountService.GetUserByToken(token);
-        var userCommunity = user.CommunityUser.FirstOrDefault(c => c.CommunityId == id);
+        var user = await accountService.GetUserById(userId);
+       var userCommunity =
+           context.CommunityUser.Where(c => c.UserId == user.Id).FirstOrDefault(c => c.CommunityId == id);;
         return userCommunity?.Role.ToString() ?? null;
         
     }
 
-    public async Task SubscribeCommunity(Guid id, string token)
+    public async Task SubscribeCommunity(Guid id, string userId)
     {
-        var user = await accountService.GetUserByToken(token);
+        var user = await accountService.GetUserById(userId);
         var community = context.Communities.FirstOrDefault(c => c.Id == id);
         if (community == null) throw new CustomException("Community not found", 400);
         if (community.CommunityUser.Any(s => s.UserId == user.Id)) throw new CustomException("User is already a subscriber", 400);
@@ -50,9 +51,9 @@ public class CommunityService(DataContext context, IAccountService accountServic
         await context.SaveChangesAsync();
     }
     
-    public async Task UnsubscribeCommunity(Guid id, string token)
+    public async Task UnsubscribeCommunity(Guid id, string userId)
     {
-        var user = await accountService.GetUserByToken(token);
+        var user = await accountService.GetUserById(userId);
         var community = context.Communities.Include(c => c.CommunityUser).FirstOrDefault(c => c.Id == id);
         if (community == null) throw new CustomException("Community not found", 400);
         var communityUser = community.CommunityUser.FirstOrDefault(c => c.UserId == user.Id);
@@ -77,17 +78,20 @@ public class CommunityService(DataContext context, IAccountService accountServic
             .ToList());
     }
 
-    // public async Task<List<CommunityUserDto>> GetMyCommunities(string token)
-    // {
-    //     var user = await accountService.GetUserByToken(token);
-    //     var communities = await GetUserCommunityList(user.Id);
-    //
-    //     var userList = new List<CommunityUserDto>();
-    //     foreach (var community in communities)
-    //     {
-    //         var communityUser = community.CommunityUser.
-    //         userList.Add(communityUser);
-    //     }
-    //     return userList;
-    // }
+    public async Task<List<CommunityUserDto>> GetMyCommunities(string userId)
+    {
+        var user = await accountService.GetUserById(userId);
+        var communities = await GetUserCommunityList(user.Id);
+        
+        var userList = new List<CommunityUserDto>();
+        foreach (var community in communities)
+        {
+            var communityUser = community.CommunityUser;
+            var communityUserDtos = communityUser
+                .Select(c => CommunityMapper
+                    .CommunityUserToCommunityUserDto(c)).ToList();
+            userList.AddRange(communityUserDtos);
+        }
+        return userList;
+    }
 }

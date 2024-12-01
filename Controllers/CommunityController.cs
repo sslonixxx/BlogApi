@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using blog_api.Exeptions;
 using blog_api.Models.Post;
 using blog_api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +29,9 @@ public class CommunityController(ICommunityService communityService, IPostServic
     {
         var authorizationHeader = Request.Headers["Authorization"].ToString();
         var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
-        var postId = await postService.CreatePost(createPostDto, token, id);
+        if (await tokenService.IsTokenBanned(token)) throw new CustomException("Token is banned", 401);
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+        var postId = await postService.CreatePost(createPostDto, userId, id);
         return Ok(postId);
     }
 
@@ -37,7 +41,9 @@ public class CommunityController(ICommunityService communityService, IPostServic
     {
         var authorizationHeader = Request.Headers["Authorization"].ToString();
         var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
-        var communityRole = await communityService.GetUserRole(id, token);
+        if (await tokenService.IsTokenBanned(token)) throw new CustomException("Token is banned", 401);
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+        var communityRole = await communityService.GetUserRole(id, userId);
         if (communityRole == null) return Ok("null");
         return Ok(communityRole);
     }
@@ -48,7 +54,9 @@ public class CommunityController(ICommunityService communityService, IPostServic
     {
         var authorizationHeader = Request.Headers["Authorization"].ToString();
         var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
-        await communityService.SubscribeCommunity(id, token);
+        if (await tokenService.IsTokenBanned(token)) throw new CustomException("Token is banned", 401);
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+        await communityService.SubscribeCommunity(id, userId);
         return Ok();
 
     }
@@ -59,18 +67,35 @@ public class CommunityController(ICommunityService communityService, IPostServic
     {
         var authorizationHeader = Request.Headers["Authorization"].ToString();
         var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
-        await communityService.UnsubscribeCommunity(id, token);
+        if (await tokenService.IsTokenBanned(token)) throw new CustomException("Token is banned", 401);
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+        await communityService.UnsubscribeCommunity(id, userId);
         return Ok();
     }
 
-    // [HttpGet("my")]
-    // [Authorize]
-    // public async Task<IActionResult> GetMyCommunities()
-    // {
-    //     var authorizationHeader = Request.Headers["Authorization"].ToString();
-    //     var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
-    //     var myCommunities = await communityService.GetMyCommunities(token);
-    //     return Ok(myCommunities);
-    // }
+    [HttpGet("my")]
+    [Authorize]
+    public async Task<IActionResult> GetMyCommunities()
+    {
+        var authorizationHeader = Request.Headers["Authorization"].ToString();
+        var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
+        if (await tokenService.IsTokenBanned(token)) throw new CustomException("Token is banned", 401);
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+        var myCommunities = await communityService.GetMyCommunities(userId);
+        return Ok(myCommunities);
+    }
+
+    [HttpGet("{id:guid}/post")]
+    [Authorize]
+    public async Task<IActionResult> GetCommunityPosts(Guid id, [FromQuery] List<Guid>? tags,
+        [FromQuery] PostSorting? sorting, [FromQuery] int page=1, [FromQuery] int size=5 )
+    {
+        var authorizationHeader = Request.Headers["Authorization"].ToString();
+        var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
+        if (await tokenService.IsTokenBanned(token)) throw new CustomException("Token is banned", 401);
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+        var posts = await postService.GetCommunityPosts(id, tags, sorting, page, size, userId);
+        return Ok(posts);
+    }
     
 }

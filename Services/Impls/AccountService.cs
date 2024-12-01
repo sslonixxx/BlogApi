@@ -1,5 +1,6 @@
 using Azure;
 using blog_api.Exeptions;
+using blog_api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Ocsp;
 using Response = blog_api.Models.Response.Response;
@@ -59,6 +60,11 @@ public class AccountService(DataContext context, IPasswordHasher passwordHasher,
         var user = await context.Users.FirstOrDefaultAsync(user => user.Id.ToString() == userId);
         if(user == null) throw new ProfileNotExistsExeption(ErrorConstants.ProfileNotExistsError);
         return user;
+    }
+
+    public Task<User?> GetUserById(string id)
+    {
+        return  context.Users.FirstOrDefaultAsync(user => user.Id.ToString() == id);
     }
 
     public async Task<UserDto> GetProfile(string token)

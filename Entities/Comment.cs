@@ -29,5 +29,10 @@ public class Comment
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public int SubComments { get; set; }
+    
+    public Guid PostId { get; set; }
+    public Comment? CommentParent { get; set; }
+    public Post Post { get; set; }
+    public User User { get; set; }
 
 }

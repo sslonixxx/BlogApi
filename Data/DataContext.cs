@@ -20,10 +20,13 @@ public class DataContext : DbContext
     public DbSet<Community> Communities { get; set; }
     
     public DbSet<CommunityUser> CommunityUser { get; set; }
+    
+    public DbSet<Comment> Comments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CommunityUser>()
             .HasKey(cm => new { cm.UserId, cm.CommunityId });
     }
+
 }

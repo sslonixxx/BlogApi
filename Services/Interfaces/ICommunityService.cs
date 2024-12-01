@@ -8,7 +8,8 @@ public interface ICommunityService
 
     public Task SubscribeCommunity(Guid id, string token);
     public Task UnsubscribeCommunity(Guid id, string token);
-    //public Task<List<CommunityUserDto>> GetMyCommunities(string token);
+    public Task<List<CommunityUserDto>> GetMyCommunities(string token);
+    
 
 
 }

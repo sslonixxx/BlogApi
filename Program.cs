@@ -73,6 +73,7 @@ services.AddScoped<IPasswordHasher, PasswordHasher>();
 services.AddScoped<ITagService, TagService>();
 services.AddScoped<ICommunityService, CommunityService>();
 services.AddScoped<IPostService, PostService>();
+services.AddScoped<ICommentService, CommentService>();
 services.AddEndpointsApiExplorer();
 
 
@@ -109,7 +110,6 @@ services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-app.UseMiddleware<ExeptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,5 +1,6 @@
-using Azure;
 using Response = blog_api.Models.Response.Response;
+
+namespace blog_api.Services.Interfaces;
 
 public interface IAccountService
 {
@@ -9,4 +10,5 @@ public interface IAccountService
     public Task<UserDto> GetProfile(string? token);
     public Task<Response> EditProfile(UserEditModel userEditModel, string token);
     public Task<User> GetUserByToken(string token);
+    public Task<User?> GetUserById(string id);
 }

@@ -46,4 +46,13 @@ public abstract class PostMapper(DataContext context)
         };
         return postFullDto;
     }
+
+    public static PostPagedListDto ToPostPagedListDto(List<PostDto?> postsFull, PageInfoModel pagination)
+    {
+        return new PostPagedListDto()
+        {
+            PostDto = postsFull,
+            PageInfoModel = pagination
+        };
+    }
 }
