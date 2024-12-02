@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace blog_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241201042421_AddData")]
+    [Migration("20241201080646_AddData")]
     partial class AddData
     {
         /// <inheritdoc />

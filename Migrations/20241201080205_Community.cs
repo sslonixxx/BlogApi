@@ -200,7 +200,7 @@ namespace blog_api.Migrations
                 name: "IX_Comment_UserId",
                 table: "Comment",
                 column: "UserId");
-            
+
             migrationBuilder.CreateIndex(
                 name: "IX_CommunityUser_CommunityId",
                 table: "CommunityUser",
@@ -225,7 +225,6 @@ namespace blog_api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Comment");
-            
 
             migrationBuilder.DropTable(
                 name: "CommunityUser");
