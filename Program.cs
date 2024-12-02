@@ -74,6 +74,7 @@ services.AddScoped<ITagService, TagService>();
 services.AddScoped<ICommunityService, CommunityService>();
 services.AddScoped<IPostService, PostService>();
 services.AddScoped<ICommentService, CommentService>();
+services.AddScoped<IAuthorService, AuthorService>();
 services.AddEndpointsApiExplorer();
 
 
