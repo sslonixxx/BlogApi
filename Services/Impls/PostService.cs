@@ -18,7 +18,8 @@ public class PostService(
     {
         var posts = context.Posts
             .Include(post => post.Tags)
-            .Include(post => post.LikedUsers);
+            .Include(post => post.LikedUsers)
+            .AsQueryable();
 
         return posts;
     }
@@ -94,14 +95,15 @@ public class PostService(
         int? maxReadingTime, PostSorting? sorting,
         bool onlyMyCommunities, int page, int size, string userId)
     {
-        var posts = context.Posts.AsQueryable();
+        //var posts = context.Posts.AsQueryable();
+        var posts = GetAllPosts();
         if (minReadingTime != null && maxReadingTime != null && maxReadingTime < minReadingTime)
             throw new CustomException("Max reading time can't be less than min reading time", 400);
         if (size <= 0) throw new CustomException("Invalid size value", 400);
         if (page <= 0) throw new CustomException("Invalid page value", 400);
 
         var user = await accountService.GetUserById(userId);
-        //var posts = GetAllPosts();
+        
         
 
         foreach (var tagId in tags)
@@ -110,7 +112,7 @@ public class PostService(
                 throw new CustomException($"Can't find tag with {tagId} id", 400);
         }
 
-        posts = posts.Where(p => p.Tags!.Any(tag => tags.Contains(tag.Id)));
+        if (tags is {Count: > 0}) posts = posts.Where(p => p.Tags.Any(tag => tags.Contains(tag.Id)));
         if (author != null) posts = posts.Where(p => p.Author == author);
         if (minReadingTime != null) posts = posts.Where(p => p.ReadingTime >= minReadingTime);
         if (maxReadingTime != null) posts = posts.Where(p => p.ReadingTime <= maxReadingTime);
@@ -121,7 +123,7 @@ public class PostService(
         posts = posts.Where(p =>
             !closedCommunitiesId.Contains(p.Id) || userCommunitiesId.Contains(p.CommunityId.Value));
         ;
-        posts = sorting switch
+        if (sorting != null) posts = sorting switch
         {
             PostSorting.CreateAsc => posts.OrderBy(p => p.CreateTime),
             PostSorting.CreateDesc => posts.OrderByDescending(p => p.CreateTime),
@@ -202,8 +204,8 @@ public class PostService(
                 throw new CustomException($"Can't find tag with {tagId} id", 400);
         }
 
-        posts = posts.Where(p => p.Tags!.Any(tag => tags.Contains(tag.Id)));
-        posts = sorting switch
+        if (tags is {Count: > 0}) posts = posts.Where(p => p.Tags.Any(tag => tags.Contains(tag.Id)));
+        if (sorting != null) posts = sorting switch
         {
             PostSorting.CreateAsc => posts.OrderBy(p => p.CreateTime),
             PostSorting.CreateDesc => posts.OrderByDescending(p => p.CreateTime),
