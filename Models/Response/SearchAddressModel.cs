@@ -1,14 +1,14 @@
 using Org.BouncyCastle.Utilities;
 
-public class SearchAdressModel
+public class SearchAddressModel
 {
-    public int ObjectId { get; set; }
+    public long ObjectId { get; set; }
 
     public Guid ObjectGuid { get; set; }
 
     public string? Text { get; set; }
 
-    public GarAdressLevel GarAdressLevel { get; set; }
+    public string Level { get; set; }
 
     public string? ObjectLevelText { get; set; }
 

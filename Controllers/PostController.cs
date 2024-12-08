@@ -63,7 +63,7 @@ public class PostController(IPostService postService, ITokenService tokenService
     }
 
     [HttpGet("post")]
-    //[Authorize]
+    [Authorize]
     public async Task<IActionResult> GetPosts([FromQuery] List<Guid>? tags, [FromQuery] string? author,
         [FromQuery] int? minReadingTime, [FromQuery] int? maxReadingTime, [FromQuery] PostSorting? sorting=null,
         [FromQuery] bool onlyMyCommunities = false, [FromQuery] int page = 1, [FromQuery] int size = 5)
