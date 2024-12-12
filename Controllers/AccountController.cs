@@ -47,7 +47,6 @@ public class AccountController(IAccountService accountService, ILogger<AccountCo
     
     [Authorize]
     [HttpPost("logout")]
-    //[SwaggerOperation(Summary = SwaggerOperationConstants.UserLogout)]
     public async Task<IActionResult> Logout()
     {
         string token = HttpContext.Request.Headers["Authorization"];

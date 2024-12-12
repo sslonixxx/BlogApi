@@ -9,7 +9,7 @@ namespace blog_api.Controllers;
 
 [ApiController]
 [Route("api")]
-public class CommentController(ITokenService tokenService, ICommentService commentService): BaseController
+public class CommentController(ITokenService tokenService, ICommentService commentService): ControllerBase
 {
     [HttpPost("post/{postId}/comment")]
     [Authorize]

@@ -76,4 +76,11 @@ public class PostController(IPostService postService, ITokenService tokenService
             size, userId!);
         return Ok(posts);
     }
+
+    // [HttpGet("email")]
+    // public async Task<IActionResult> GetEmail()
+    // {
+    //     await _emailSenderService.Send("email@gmail.com", "ubuybu", "hghgv");
+    //     return Ok();
+    // }
 }

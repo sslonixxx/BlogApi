@@ -24,7 +24,7 @@ public abstract class PostMapper(DataContext context)
         return post;
     }
 
-    public static PostFullDto PostToPostFullDto(Post post, User user, List<TagDto?> tags)
+    public static PostFullDto PostToPostFullDto(Post post, User user, List<TagDto?> tags, List<CommentDto> comments)
     {
         var postFullDto = new PostFullDto()
         {
@@ -41,7 +41,8 @@ public abstract class PostMapper(DataContext context)
             CommunityName = post.CommunityName,
             Likes = post.Likes,
             HasLike = post.LikedUsers.Any(u => u.Id == post.AuthorId),
-            //добавить комментарии и cкушать тортик))))))))
+            Comments = comments,
+            CommentsCount = comments.Count,
             Tags = tags
         };
         return postFullDto;

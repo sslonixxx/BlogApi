@@ -372,3 +372,5 @@
 /Users/gerget/RiderProjects/webNET-2024_aspnet_1/obj/Debug/net8.0/ref/blog-api.dll
 /Users/gerget/RiderProjects/webNET-2024_aspnet_1/bin/Debug/net8.0/Castle.Core.dll
 /Users/gerget/RiderProjects/webNET-2024_aspnet_1/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Proxies.dll
+/Users/gerget/RiderProjects/webNET-2024_aspnet_1/bin/Debug/net8.0/System.Security.Cryptography.Pkcs.dll
+/Users/gerget/RiderProjects/webNET-2024_aspnet_1/bin/Debug/net8.0/runtimes/win/lib/net8.0/System.Security.Cryptography.Pkcs.dll

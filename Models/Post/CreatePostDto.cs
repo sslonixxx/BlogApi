@@ -16,7 +16,8 @@ public class CreatePostDto
 
     [Required(ErrorMessage = ErrorConstants.RequiredFieldError)]
     public int ReadingTime { get; set; }
-
+    
+    [RegularExpression(@"^(http|https|ftp)://[^\s/$.?#].[^\s]*$", ErrorMessage = "The Image field is not a valid fully-qualified http, https, or ftp URL.")]
     public string? Image { get; set; }
 
     public Guid? AddressId { get; set; } = null;

@@ -49,6 +49,6 @@ public class Post
 
     public List<Tag?> Tags { get; set; } = new();
 
-    public List<CommentDto> Comments { get; set; } = new();
+    public List<Comment> Comments { get; set; } = new();
 
 }

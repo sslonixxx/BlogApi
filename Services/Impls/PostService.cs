@@ -4,21 +4,25 @@ using blog_api.Models.Post;
 using blog_api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MimeKit.Encodings;
+using Quartz;
+using Quartz.Impl;
 
 namespace blog_api.Services.Impls;
 
 public class PostService(
     DataContext context,
     IAccountService accountService,
-    ICommunityService communityService,
     ITagService tagService,
-    ITokenService tokenService) : IPostService
+    IAddressService addressService,
+    IScheduler scheduler,
+    IEmailService emailService) : IPostService
 {
     private IQueryable<Post> GetAllPosts()
     {
         var posts = context.Posts
             .Include(post => post.Tags)
             .Include(post => post.LikedUsers)
+            .Include(post => post.Comments)
             .AsQueryable();
 
         return posts;
@@ -29,6 +33,7 @@ public class PostService(
         if (createPostDto.Tags.Count == 0) throw new CustomException("Specify at least one tag for a new post", 400);
         var posts = context.Posts;
         var user = await accountService.GetUserById(userId);
+        tagService.CheckTags(createPostDto.Tags);
         var tags = await tagService.GetTagsById(createPostDto);
 
         var community = context.Communities.FirstOrDefault(community => community.Id == communityId);
@@ -36,21 +41,30 @@ public class PostService(
         if (community != null &&
             context.CommunityUser.All(uc => uc.UserId != user.Id || uc.Role != CommunityRole.Administrator))
             throw new CustomException("User is not an admin of this community", 403);
+        
+        if (createPostDto.AddressId != null && !await addressService.IsAddressAvailable((Guid)createPostDto.AddressId))
+            throw new CustomException("Invalid address", 400);
+        
         var post = PostMapper.MapCreatePostDtoToPost(createPostDto, user, tags, communityId, communityName);
         posts.Add(post);
         await context.SaveChangesAsync();
+        if (communityId!= null)
+        {
+            await emailService.NotifyCommunity(communityId);
+
+        }
         return post.Id;
     }
-
+    
     public async Task<PostFullDto> GetPostById(Guid postId, string userId)
     {
         var post = await GetAllPosts().FirstOrDefaultAsync(p => p.Id == postId);
-        //var post = context.Posts.FirstOrDefault(post => post.Id == postId);
         if (post == null) throw new CustomException("There is not a post with this Id", 400);
+        var comments = post.Comments.Select(c => CommentMapper.CommentToCommentDto(c)).ToList();
         var tags = post.Tags.Select(t => TagMapper.TagToTagDto(t)).ToList();
         var user = await accountService.GetUserById(userId);
-        //проверить права
-        return PostMapper.PostToPostFullDto(post, user, tags);
+        CheckClosedCommunity(post, user);
+        return PostMapper.PostToPostFullDto(post, user, tags,comments);
     }
 
     public void CheckClosedCommunity(Post post, User? user)
@@ -95,7 +109,6 @@ public class PostService(
         int? maxReadingTime, PostSorting? sorting,
         bool onlyMyCommunities, int page, int size, string userId)
     {
-        //var posts = context.Posts.AsQueryable();
         var posts = GetAllPosts();
         if (minReadingTime != null && maxReadingTime != null && maxReadingTime < minReadingTime)
             throw new CustomException("Max reading time can't be less than min reading time", 400);
@@ -121,8 +134,7 @@ public class PostService(
         var userCommunitiesId =
             context.CommunityUser.Where(c => c.UserId == user.Id).Select(c => c.CommunityId).ToList();
         posts = posts.Where(p =>
-            !closedCommunitiesId.Contains(p.Id) || userCommunitiesId.Contains(p.CommunityId.Value));
-        ;
+            !closedCommunitiesId.Contains(p.CommunityId.Value) || userCommunitiesId.Contains(p.CommunityId.Value));
         if (sorting != null) posts = sorting switch
         {
             PostSorting.CreateAsc => posts.OrderBy(p => p.CreateTime),
@@ -161,9 +173,11 @@ public class PostService(
     {
         var post = context.Posts.Include(p => p.Tags)
             .Include(p => p.LikedUsers)
+            .Include(p => p.Comments)
             .FirstOrDefault(p => p.Id == postId);
         if (post == null) return null;
-        //комментарии
+        var comments = post.Comments.Select(c => CommentMapper.CommentToCommentDto(c)).ToList();
+
         var postDto = new PostDto
         {
             Id = post.Id,
@@ -177,7 +191,7 @@ public class PostService(
             CommunityId = post.CommunityId,
             CommunityName = post.CommunityName,
             AddressId = post.AddressId,
-            CommentsCount = 0,
+            CommentsCount = comments.Count,
             HasLike = post.LikedUsers.Any(u => u.Id == userId),
             Tags = post.Tags.Select(t => TagMapper.TagToTagDto(t)).ToList(),
         };

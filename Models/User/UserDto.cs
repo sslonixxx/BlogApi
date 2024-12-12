@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using blog_api.Constants;
 
 public class UserDto
 {
@@ -23,6 +24,7 @@ public class UserDto
     public string Email { get; set; }
 
     [RegularExpression(RegexConstants.PhoneNumberRegex)]
+    [MinAge(14, ErrorMessage = "The user must be at least 14 years old.")]
     public string? PhoneNumber { get; set; }
 
 }

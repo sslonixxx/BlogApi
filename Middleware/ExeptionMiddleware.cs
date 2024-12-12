@@ -50,19 +50,19 @@ public class ExeptionMiddleware(RequestDelegate next, ILogger<ExeptionMiddleware
         {
             StatusCode = exception.StatusCode,
             Message = exception.Message
-        }.ToString());
+        }.ToString() ?? throw new InvalidOperationException());
     }
 
     private static Task HandleExceptionsAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
+    
         return context.Response.WriteAsync(new
         {
             StatusCode = StatusCodes.Status500InternalServerError,
             Message = "An unexpected error occurred"
-        }.ToString());
+        }.ToString() ?? throw new InvalidOperationException());
     }
     
 }

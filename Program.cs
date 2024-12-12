@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-// using blog_api.Data;
+using blog_api.BackgroundJob;
 using blog_api.Middleware;
 using blog_api.Models.Fias;
 using blog_api.Services.Impls;
@@ -10,6 +10,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Quartz;
+using Quartz.Impl;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +49,7 @@ services.AddSingleton(provider =>
 
 
 
+
 services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -76,8 +79,18 @@ services.AddScoped<IPostService, PostService>();
 services.AddScoped<ICommentService, CommentService>();
 services.AddScoped<IAuthorService, AuthorService>();
 services.AddScoped<IAddressService, AddressService>();
+
 services.AddEndpointsApiExplorer();
 
+builder.Services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+builder.Services.AddSingleton(provider => provider.GetRequiredService<ISchedulerFactory>().GetScheduler().Result);
+services.AddScoped<IEmailService, EmailSenderService>();
+services.AddScoped<DataQuartzJob>();
+builder.Services.AddQuartz(q =>
+{
+    q.UseMicrosoftDependencyInjectionJobFactory();
+});
+services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 
 services.AddSwaggerGen(options =>
@@ -108,7 +121,10 @@ services.AddSwaggerGen(options =>
     });
 });
 
-
+var emailConfig = configuration
+    .GetSection("EmailConfiguration")
+    .Get<EmailConfiguration>();
+services.AddSingleton(emailConfig);
 
 var app = builder.Build();
 
@@ -124,6 +140,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+// app.UseMiddleware<ExeptionMiddleware>();
 
 app.Run();
 

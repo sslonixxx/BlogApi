@@ -72,4 +72,14 @@ public class AddressService(AddressContext addressContext) : IAddressService
         if (id == null) throw new CustomException("Can't find address with this id",400);
         return id;
     }
+    public async Task<bool> IsAddressAvailable(Guid id)
+    {
+        var isAddressObj = await addressContext.AsAddrObjs.AnyAsync(a => a.Objectguid == id);
+        if (!isAddressObj)
+        {
+            var isAddressHouse = await addressContext.AsHouses.AnyAsync(a => a.Objectguid == id);
+            return isAddressHouse;
+        }
+        return isAddressObj;
+    }
 }
