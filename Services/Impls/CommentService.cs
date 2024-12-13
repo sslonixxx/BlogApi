@@ -140,26 +140,41 @@ public class CommentService(IAccountService accountService, DataContext context)
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<CommentDto>> GetCommentTree(Guid commentId, string userId)
+    public async Task<List<CommentDto>> GetCommentTree(Guid commentId, string userId, List<CommentDto>? commentsList = null)
     {
-        var comments = await context.Comments
-            .Where(c => c.CommentParent.Id == commentId && c.CommentParent.Id != null)
-            .ToListAsync();
-        var commentsList = (from comment in comments
-            let subComments = context.Comments
-                .Where(c => c.CommentParent.Id == comment.Id && c.CommentParent.Id != null).ToListAsync()
-                select new CommentDto
-            {
-                Id = comment.Id,
-                ModifiedDate = comment.ModifiedDate,
-                Content = comment.Content,
-                DeleteDate = comment.DeleteDate,
-                CreateTime = comment.CreateTime,
-                Author = comment.Author,
-                AuthorId = comment.AuthorId,
-                SubComments = subComments.Result.Count,
-            }).ToList();
-        return commentsList;
+        commentsList ??= new List<CommentDto>();
+        var comment = await context.Comments.FirstOrDefaultAsync(c => c.Id == commentId);
+        
+        if (comment == null)
+        {
+            return commentsList;
+        }
+        
+        var commentDto = new CommentDto
+        {
+            Id = comment.Id,
+            ModifiedDate = comment.ModifiedDate,
+            Content = comment.Content,
+            DeleteDate = comment.DeleteDate,
+            CreateTime = comment.CreateTime,
+            Author = comment.Author,
+            AuthorId = comment.AuthorId,
+            SubComments = comment.SubComments
+        };
 
+        commentsList.Add(commentDto);
+        
+        var subComments = await context.Comments
+            .Where(c => c.CommentParent != null && c.CommentParent.Id == commentId)
+            .ToListAsync();
+
+        foreach (var subComment in subComments)
+        {
+            await GetCommentTree(subComment.Id, userId, commentsList);
+        }
+
+        return commentsList;
     }
+
+
 }

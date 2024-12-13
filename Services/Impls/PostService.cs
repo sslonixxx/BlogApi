@@ -74,7 +74,6 @@ public class PostService(
             (user == null || user.CommunityUser.All(uc => uc.CommunityId != community.Id)))
             throw new CustomException("You don't have rights", 403);
     }
-
     public async Task LikePost(Guid postId, string userId)
     {
         var post = await GetAllPosts().FirstOrDefaultAsync(p => p.Id == postId);
@@ -109,14 +108,13 @@ public class PostService(
         int? maxReadingTime, PostSorting? sorting,
         bool onlyMyCommunities, int page, int size, string userId)
     {
-        var posts = GetAllPosts();
         if (minReadingTime != null && maxReadingTime != null && maxReadingTime < minReadingTime)
             throw new CustomException("Max reading time can't be less than min reading time", 400);
         if (size <= 0) throw new CustomException("Invalid size value", 400);
         if (page <= 0) throw new CustomException("Invalid page value", 400);
 
         var user = await accountService.GetUserById(userId);
-        
+        var posts = GetAllPosts();
         
 
         foreach (var tagId in tags)

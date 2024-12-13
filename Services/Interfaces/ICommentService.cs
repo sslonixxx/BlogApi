@@ -8,7 +8,8 @@ public interface ICommentService
 
     public Task EditComment(UpdateCommentDto updateCommentDto, Guid commentId, string userId);
     public Task DeleteComment(Guid commentId, string userId);
-    public Task<List<CommentDto>> GetCommentTree(Guid commentId, string userId);
+    //public Task<List<CommentDto>> GetCommentTree(Guid commentId, string userId);
+    public Task<List<CommentDto>> GetCommentTree(Guid commentId, string userId, List<CommentDto>? commentsList = null);
 
 
 
