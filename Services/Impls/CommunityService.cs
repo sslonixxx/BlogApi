@@ -42,7 +42,7 @@ public class CommunityService(DataContext context, IAccountService accountServic
         var user = await accountService.GetUserById(userId);
         var community = context.Communities.FirstOrDefault(c => c.Id == id);
         if (community == null) throw new CustomException("Community not found", 400);
-        if (community.CommunityUser.Any(s => s.UserId == user.Id)) throw new CustomException("User is already a subscriber", 400);
+        if (context.CommunityUser.Where(c=> c.CommunityId == community.Id).Any(s => s.UserId == user.Id)) throw new CustomException("User is already a subscriber", 400);
         CommunityUser communityUser = new CommunityUser()
         {
             UserId = user.Id,
@@ -61,14 +61,10 @@ public class CommunityService(DataContext context, IAccountService accountServic
         var user = await accountService.GetUserById(userId);
         var community = context.Communities.Include(c => c.CommunityUser).FirstOrDefault(c => c.Id == id);
         if (community == null) throw new CustomException("Community not found", 400);
-        var communityUser = community.CommunityUser.FirstOrDefault(c => c.UserId == user.Id);
+        var communityUser = context.CommunityUser.Where(c => c.CommunityId==community.Id).FirstOrDefault(c => c.UserId == user.Id);
+        if (communityUser.Role == CommunityRole.Administrator) throw new CustomException($"User with this id not subscribe to the community {communityUser.CommunityId}", 400);
         if (communityUser == null) throw new CustomException("User not found", 400);
-        var admins = community.CommunityUser.Where(uc => uc.Role == CommunityRole.Administrator).ToList();
-        if (communityUser.Role == CommunityRole.Subscriber && admins.Count == 1)
-        {
-            var randomUser = community.CommunityUser.FirstOrDefault(c => c.Role == CommunityRole.Subscriber);
-            randomUser.Role = CommunityRole.Administrator;
-        }
+        
         community.CommunityUser.Remove(communityUser);
         community.SubscribersCount--;
         await context.SaveChangesAsync();
