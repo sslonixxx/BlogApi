@@ -18,4 +18,7 @@ public interface IPostService
     public Task<PostPagedListDto> GetCommunityPosts(Guid communityId, List<Guid>? tags, PostSorting? sorting,
         int page, int size, string token);
 
+    public void CheckClosedCommunity(Post post, User? user);
+
+
 }

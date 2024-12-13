@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace blog_api.Services.Impls;
 
-public class CommentService(IAccountService accountService, DataContext context): ICommentService
+public class CommentService(IAccountService accountService, DataContext context, IPostService postService): ICommentService
 {
     
     public async Task CreateComment(CreateCommentDto createCommentDto, Guid postId, string userId)
@@ -12,11 +12,7 @@ public class CommentService(IAccountService accountService, DataContext context)
         var post = await context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
         if (post == null) throw new CustomException("Can't find this post", 400);
         var user = await accountService.GetUserById(userId);
-        if (post.CommunityId != null && context.Communities.FirstOrDefault(c => c.Id==post.CommunityId)!.IsClosed &&
-            user.CommunityUser.All(uc => uc.CommunityId != post.CommunityId))
-        {
-            throw new CustomException("User can't comment this post", 403);
-        }
+        postService.CheckClosedCommunity(post, user);
       
         if (user==null) throw new CustomException("User not found", 404);
         if (createCommentDto.ParentId == null || createCommentDto.ParentId == Guid.Empty)
@@ -140,11 +136,13 @@ public class CommentService(IAccountService accountService, DataContext context)
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<CommentDto>> GetCommentTree(Guid commentId, string userId, List<CommentDto>? commentsList = null)
+    public async Task<List<CommentDto>> GetCommentTree(Guid commentId, string userId, List<CommentDto>? commentsList = null, bool isRoot = true)
     {
         commentsList ??= new List<CommentDto>();
         var comment = await context.Comments.FirstOrDefaultAsync(c => c.Id == commentId);
-        
+        var post = await context.Posts.FirstOrDefaultAsync(p => p.Id == comment.PostId);
+        var user = await accountService.GetUserById(userId);
+        postService.CheckClosedCommunity(post, user);
         if (comment == null)
         {
             return commentsList;
@@ -170,9 +168,12 @@ public class CommentService(IAccountService accountService, DataContext context)
 
         foreach (var subComment in subComments)
         {
-            await GetCommentTree(subComment.Id, userId, commentsList);
+            await GetCommentTree(subComment.Id, userId, commentsList, false);
         }
-
+        if (isRoot && commentsList.Any())
+        {
+            commentsList.RemoveAt(0);
+        }
         return commentsList;
     }
 

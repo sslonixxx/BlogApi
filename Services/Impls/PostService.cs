@@ -71,7 +71,7 @@ public class PostService(
     {
         Community? community = context.Communities.FirstOrDefault(c => c.Id == post.CommunityId);
         if (post.CommunityId != null && community.IsClosed &&
-            (user == null || user.CommunityUser.All(uc => uc.CommunityId != community.Id)))
+            (user == null || context.CommunityUser.Where(c => c.UserId == user.Id).All(uc => uc.CommunityId != community.Id)))
             throw new CustomException("You don't have rights", 403);
     }
     public async Task LikePost(Guid postId, string userId)
