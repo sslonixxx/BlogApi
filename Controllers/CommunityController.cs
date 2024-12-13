@@ -20,7 +20,11 @@ public class CommunityController(ICommunityService communityService, IPostServic
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetCommunityInformation(Guid id)
     {
-        return Ok(await communityService.GetCommunityInformation(id));
+        var authorizationHeader = Request.Headers["Authorization"].ToString();
+        var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
+        if (await tokenService.IsTokenBanned(token)) throw new CustomException("Token is banned", 401);
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+        return Ok(await communityService.GetCommunityInformation(id, userId));
     }
 
     [HttpPost("{id:guid}/post")]

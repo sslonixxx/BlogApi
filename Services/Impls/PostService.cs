@@ -1,3 +1,4 @@
+using blog_api.EmailSenderService;
 using blog_api.Exeptions;
 using blog_api.Mappers;
 using blog_api.Models.Post;

@@ -1,4 +1,4 @@
-namespace blog_api.BackgroundJob;
+namespace blog_api.EmailSenderService;
 
 public class EmailConfiguration
 {

@@ -16,9 +16,14 @@ public class CommunityService(DataContext context, IAccountService accountServic
         return communities;
     }
 
-    public async Task<CommunityDto?> GetCommunityInformation(Guid id)
+    public async Task<CommunityDto?> GetCommunityInformation(Guid id, string userId)
     {
-        var community = context.Communities.FirstOrDefault(t => t.Id == id);
+        Community? community = context.Communities.FirstOrDefault(c => c.Id == id);
+        var user = await accountService.GetUserById(userId);
+        if (id != null && community.IsClosed &&
+            (user == null || context.CommunityUser.Where(c => c.UserId == user.Id).All(uc => uc.CommunityId != community.Id))) {
+            throw new CustomException("You don't have rights", 403);
+        }
         if (community == null) throw new CustomException("Community not found", 400);
         return CommunityMapper.CommunityToCommunityDto(community);
     }
@@ -68,29 +73,17 @@ public class CommunityService(DataContext context, IAccountService accountServic
         community.SubscribersCount--;
         await context.SaveChangesAsync();
     }
-    
-    public Task<List<Community>> GetUserCommunityList(Guid userId)
-    {
-        return Task.FromResult(context.Communities
-            .Include(c => c.CommunityUser)!
-            .ThenInclude(m => m.User)
-            .Where(c => c.CommunityUser!.Any(m => m.UserId == userId))
-            .ToList());
-    }
 
     public async Task<List<CommunityUserDto>> GetMyCommunities(string userId)
     {
         var user = await accountService.GetUserById(userId);
-        var communities = await GetUserCommunityList(user.Id);
+        var communityUsers = context.CommunityUser.Where(c => c.UserId == user.Id).ToList();
         
         var userList = new List<CommunityUserDto>();
-        foreach (var community in communities)
+        foreach (var communityUser in communityUsers)
         {
-            var communityUser = community.CommunityUser;
-            var communityUserDtos = communityUser
-                .Select(c => CommunityMapper
-                    .CommunityUserToCommunityUserDto(c)).ToList();
-            userList.AddRange(communityUserDtos);
+            var communityUserDto = CommunityMapper.CommunityUserToCommunityUserDto(communityUser);
+            userList.Add(communityUserDto);
         }
         return userList;
     }

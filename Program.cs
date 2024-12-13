@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using blog_api.BackgroundJob;
+using blog_api.EmailSenderService;
 using blog_api.Middleware;
 using blog_api.Models.Fias;
 using blog_api.Services.Impls;
@@ -85,12 +85,12 @@ services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
 builder.Services.AddSingleton(provider => provider.GetRequiredService<ISchedulerFactory>().GetScheduler().Result);
 services.AddScoped<IEmailService, EmailSenderService>();
-services.AddScoped<DataQuartzJob>();
-builder.Services.AddQuartz(q =>
-{
-    q.UseMicrosoftDependencyInjectionJobFactory();
-});
-services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+// services.AddScoped<DataQuartzJob>();
+// builder.Services.AddQuartz(q =>
+// {
+//     q.UseMicrosoftDependencyInjectionJobFactory();
+// });
+// services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 
 services.AddSwaggerGen(options =>

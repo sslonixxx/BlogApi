@@ -1,28 +1,30 @@
-
-using blog_api.EmailService;
+namespace blog_api.EmailSenderService;
+using System.Net.Mail;
 using blog_api.Exeptions;
 using blog_api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Quartz;
-
-public class DataQuartzJob : IJob
+public class EmailSenderService : IEmailService
 {
-    private readonly IEmailService _emailSenderService;
-    private readonly DataContext _context;
+    private readonly EmailConfiguration _emailConfig;
+    private readonly string _username;
+    private readonly SmtpClient smtpClient;
+    public DataContext _context;
     private readonly IAccountService _accountService;
 
-    public DataQuartzJob(IEmailService emailSenderService, DataContext context, IAccountService accountService)
+    public EmailSenderService(EmailConfiguration emailConfig, IAccountService accountService, DataContext context)
     {
-        _emailSenderService = emailSenderService;
+        _emailConfig = emailConfig; 
+        smtpClient = new SmtpClient(_emailConfig.SmtpServer, _emailConfig.Port);
+        _username = emailConfig.UserName;
+        smtpClient.EnableSsl = false;
+        smtpClient.Timeout = 2000;
         _context = context;
         _accountService = accountService;
     }
 
-    public async Task Execute(IJobExecutionContext context)
+    
+    public async Task NotifyCommunity(Guid? communityId)
     {
-        Console.WriteLine("Starting job execution...");
-        var communityId = Guid.Parse(context.JobDetail.JobDataMap.GetString("communityId"));
-
         var userIds = await _context.CommunityUser
             .Where(c => c.CommunityId == communityId)
             .Select(c => c.UserId)
@@ -40,8 +42,14 @@ public class DataQuartzJob : IJob
             var subject = "New Post in " + community.Name;
             var body = $"A new post has been published in the community '{community.Name}'.";
 
-            await _emailSenderService.Send(user.Email, subject, body);
+            await Send(user.Email, subject, body);
             Console.WriteLine($"Email sent to {user.Email}");
         }
     }
+    public async Task Send(string toEmail, string subject, string body)
+    {
+        MailMessage message = new MailMessage(_emailConfig.UserName, toEmail, subject, body);
+        smtpClient.Send(message);
+    }
+
 }
