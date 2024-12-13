@@ -47,9 +47,6 @@ services.AddSingleton(provider =>
     };
 });
 
-
-
-
 services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -82,15 +79,8 @@ services.AddScoped<IAddressService, AddressService>();
 
 services.AddEndpointsApiExplorer();
 
-builder.Services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
-builder.Services.AddSingleton(provider => provider.GetRequiredService<ISchedulerFactory>().GetScheduler().Result);
 services.AddScoped<IEmailService, EmailSenderService>();
-// services.AddScoped<DataQuartzJob>();
-// builder.Services.AddQuartz(q =>
-// {
-//     q.UseMicrosoftDependencyInjectionJobFactory();
-// });
-// services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
 
 
 services.AddSwaggerGen(options =>
@@ -140,7 +130,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-// app.UseMiddleware<ExeptionMiddleware>();
+app.UseMiddleware<ExeptionMiddleware>();
 
 app.Run();
 
