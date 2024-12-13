@@ -65,22 +65,16 @@ public class PostController(IPostService postService, ITokenService tokenService
     [HttpGet("post")]
     [Authorize]
     public async Task<IActionResult> GetPosts([FromQuery] List<Guid>? tags, [FromQuery] string? author,
-        [FromQuery] int? minReadingTime, [FromQuery] int? maxReadingTime, [FromQuery] PostSorting? sorting=null,
+        [FromQuery] int? minReadingTime, [FromQuery] int? maxReadingTime, [FromQuery] PostSorting? sorting = null,
         [FromQuery] bool onlyMyCommunities = false, [FromQuery] int page = 1, [FromQuery] int size = 5)
     {
         var authorizationHeader = Request.Headers["Authorization"].ToString();
         var token = tokenService.ExtractTokenFromHeader(authorizationHeader);
         if (await tokenService.IsTokenBanned(token)) throw new CustomException("Token is banned", 401);
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
-        var posts = await postService.GetPosts(tags, author, minReadingTime, maxReadingTime, sorting, onlyMyCommunities, page,
+        var posts = await postService.GetPosts(tags, author, minReadingTime, maxReadingTime, sorting, onlyMyCommunities,
+            page,
             size, userId!);
         return Ok(posts);
     }
-
-    // [HttpGet("email")]
-    // public async Task<IActionResult> GetEmail()
-    // {
-    //     await _emailSenderService.Send("email@gmail.com", "ubuybu", "hghgv");
-    //     return Ok();
-    // }
 }

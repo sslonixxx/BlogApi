@@ -6,7 +6,6 @@ using blog_api.Models.Fias;
 using blog_api.Services.Impls;
 using blog_api.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -25,7 +24,7 @@ services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 services.AddHttpContextAccessor();
 services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddDbContext<AddressContext>(options =>
+services.AddDbContext<AddressContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString("FiasConnection")));
 
 
@@ -76,11 +75,10 @@ services.AddScoped<IPostService, PostService>();
 services.AddScoped<ICommentService, CommentService>();
 services.AddScoped<IAuthorService, AuthorService>();
 services.AddScoped<IAddressService, AddressService>();
-
 services.AddEndpointsApiExplorer();
-
+services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+services.AddSingleton(provider => provider.GetRequiredService<ISchedulerFactory>().GetScheduler().Result);
 services.AddScoped<IEmailService, EmailSenderService>();
-
 
 
 services.AddSwaggerGen(options =>

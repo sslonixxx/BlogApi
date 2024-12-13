@@ -206,7 +206,7 @@ public class PostService(
         if (community == null) throw new CustomException("Community not found", 400);
         if (community.IsClosed && community.CommunityUser.All(c => c.UserId != user.Id))
         {
-            throw new CustomException("Can't see community's posts", 400);
+            throw new CustomException("Can't see community's posts", 403);
         }
 
         var posts = GetAllPosts();
